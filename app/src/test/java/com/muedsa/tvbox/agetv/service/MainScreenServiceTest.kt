@@ -1,20 +1,21 @@
-package com.muedsa.tvbox.demoplugin.service
+package com.muedsa.tvbox.agetv.service
 
+import com.muedsa.tvbox.agetv.AgeMobileApiUrl
 import com.muedsa.tvbox.tool.createJsonRetrofit
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class MainScreenServiceTest {
 
-    private val danDanPlayApiService by lazy {
+    private val ageApiService by lazy {
         createJsonRetrofit(
-            baseUrl = "https://api.dandanplay.net/api/",
-            service = DanDanPlayApiService::class.java,
+            baseUrl = AgeMobileApiUrl,
+            service = AgeApiService::class.java,
             debug = true
         )
     }
 
-    private val service = MainScreenService(danDanPlayApiService)
+    private val service = MainScreenService(ageApiService)
 
     @Test
     fun getRowsDataTest() = runTest{
@@ -22,7 +23,7 @@ class MainScreenServiceTest {
         rows.forEach { row ->
             println("${row.title} ${row.cardWidth}X${row.cardHeight} ${row.cardType}")
             row.list.forEach {
-                println("${it.title} ${it.id} ${it.detailUrl}")
+                println("${it.title} ${it.id} ${it.detailUrl} ${it.coverImageUrl}")
             }
         }
     }
