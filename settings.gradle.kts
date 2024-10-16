@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AgeTvPlguin"
+rootProject.name = "AgeTvPlugin"
 include(":app")
 include(":api")
 project(":api").projectDir = rootDir.resolve("./TvBoxPlugin/api/")
