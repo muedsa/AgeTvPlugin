@@ -64,7 +64,7 @@ class MainScreenService(
         val list = ageApiService.slipic()
         rows.add(
             MediaCardRow(
-                title = "每日推荐",
+                title = "热门",
                 list = list.map {
                     MediaCard(
                         id = it.aid.toString(),
@@ -122,7 +122,7 @@ class MainScreenService(
     }
 
     companion object {
-        private fun convertPosterAnimeToCardList(list: List<PosterAnimeModel>): List<MediaCard> =
+        fun convertPosterAnimeToCardList(list: List<PosterAnimeModel>): List<MediaCard> =
             list.map {
                 MediaCard(
                     id = it.aid.toString(),

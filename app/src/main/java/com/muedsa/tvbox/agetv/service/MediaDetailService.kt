@@ -6,6 +6,8 @@ import com.muedsa.tvbox.agetv.AgeMobileUrlBase64
 import com.muedsa.tvbox.agetv.CardHeight
 import com.muedsa.tvbox.agetv.CardWidth
 import com.muedsa.tvbox.agetv.model.AgePlayInfoModel
+import com.muedsa.tvbox.api.data.MediaCardRow
+import com.muedsa.tvbox.api.data.MediaCardType
 import com.muedsa.tvbox.api.data.MediaDetail
 import com.muedsa.tvbox.api.data.MediaEpisode
 import com.muedsa.tvbox.api.data.MediaHttpSource
@@ -75,7 +77,31 @@ class MediaDetailService(
                 coverImageUrl = detail.video.cover,
                 cardWidth = CardWidth,
                 cardHeight = CardHeight,
-            )
+            ),
+            rows = buildList {
+                if (detail.series.isNotEmpty()) {
+                    add(
+                        MediaCardRow(
+                            title = "相关动画",
+                            list = MainScreenService.convertPosterAnimeToCardList(detail.series),
+                            cardWidth = CardWidth,
+                            cardHeight = CardHeight,
+                            cardType = MediaCardType.STANDARD
+                        )
+                    )
+                }
+                if (detail.similar.isNotEmpty()) {
+                    add(
+                        MediaCardRow(
+                            title = "相关推荐",
+                            list = MainScreenService.convertPosterAnimeToCardList(detail.similar),
+                            cardWidth = CardWidth,
+                            cardHeight = CardHeight,
+                            cardType = MediaCardType.STANDARD
+                        )
+                    )
+                }
+            }
         )
     }
 
