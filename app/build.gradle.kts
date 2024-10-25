@@ -68,4 +68,5 @@ dependencies {
 
     testImplementation(libs.junit4)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.bcprov.jdk15to18)
 }

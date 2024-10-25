@@ -1,29 +1,37 @@
 package com.muedsa.tvbox.agetv
 
-import com.muedsa.tvbox.api.plugin.TvBoxContext
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class AgeTvPluginTest {
 
-    private fun create() = AgeTvPlugin(TvBoxContext(1080, 1920, true))
-
     @Test
     fun create_test() {
-        create()
+        TestPlugin
+    }
+
+    @Test
+    fun onInit_test() = runTest {
+        TestPlugin.onInit()
+    }
+
+    @Test
+    fun onLaunched_test() = runTest {
+        TestPlugin.onLaunched()
     }
 
     @Test
     fun provideMainScreenService_test() {
-        create().provideMainScreenService()
+        TestPlugin.provideMainScreenService()
     }
 
     @Test
     fun provideMediaDetailService_test() {
-        create().provideMediaDetailService()
+        TestPlugin.provideMediaDetailService()
     }
 
     @Test
     fun provideMediaSearchService_test() {
-        create().provideMediaSearchService()
+        TestPlugin.provideMediaSearchService()
     }
 }
