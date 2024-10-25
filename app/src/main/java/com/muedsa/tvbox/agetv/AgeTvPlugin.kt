@@ -1,6 +1,5 @@
 package com.muedsa.tvbox.agetv
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.muedsa.tvbox.agetv.service.AgeApiService
 import com.muedsa.tvbox.agetv.service.MainScreenService
 import com.muedsa.tvbox.agetv.service.MediaDetailService
@@ -11,32 +10,24 @@ import com.muedsa.tvbox.api.plugin.TvBoxContext
 import com.muedsa.tvbox.api.service.IMainScreenService
 import com.muedsa.tvbox.api.service.IMediaDetailService
 import com.muedsa.tvbox.api.service.IMediaSearchService
-import com.muedsa.tvbox.tool.LenientJson
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
+import com.muedsa.tvbox.tool.PluginStoreCookieJar
+import com.muedsa.tvbox.tool.createJsonRetrofit
 
 class AgeTvPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxContext) {
 
     override var options: PluginOptions = PluginOptions(enableDanDanPlaySearch = true)
 
+    override suspend fun onInit() {}
+
+    override suspend fun onLaunched() {}
+
     private val ageApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(AgeMobileApiUrl)
-            .addConverterFactory(LenientJson.asConverterFactory("application/json".toMediaType()))
-            .client(OkHttpClient.Builder()
-                .apply {
-                    if (tvBoxContext.debug) {
-                        addInterceptor(
-                            HttpLoggingInterceptor()
-                                .also { it.level = HttpLoggingInterceptor.Level.BODY })
-                    }
-                    cookieJar(FakeCookieJar())
-                }
-                .build())
-            .build()
-            .create(AgeApiService::class.java)
+        createJsonRetrofit(
+            baseUrl = AgeMobileApiUrl,
+            service = AgeApiService::class.java,
+            debug = tvBoxContext.debug,
+            cookieJar = PluginStoreCookieJar(store = tvBoxContext.store)
+        )
     }
     private val mainScreenService by lazy { MainScreenService(ageApiService) }
     private val mediaDetailService by lazy { MediaDetailService(ageApiService, tvBoxContext.debug) }
