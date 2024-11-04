@@ -19,7 +19,7 @@ class MainScreenService(
 
     override suspend fun getRowsData(): List<MediaCardRow> {
         val rows = mutableListOf<MediaCardRow>()
-        appendSpilt(rows)
+        // appendSpilt(rows)
         appendHomeList(rows)
         appendRecommend(rows)
         appendUpdate(rows)
