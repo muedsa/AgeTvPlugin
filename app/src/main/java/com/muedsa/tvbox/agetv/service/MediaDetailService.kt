@@ -18,8 +18,10 @@ import com.muedsa.tvbox.tool.ChromeUserAgent
 import com.muedsa.tvbox.tool.LenientJson
 import com.muedsa.tvbox.tool.decryptAES128CBCPKCS7
 import com.muedsa.tvbox.tool.encryptAES128CBCPKCS7
+import com.muedsa.tvbox.tool.feignChrome
 import com.muedsa.tvbox.tool.md5
 import kotlinx.serialization.encodeToString
+import okhttp3.CookieJar
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -28,11 +30,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import timber.log.Timber
+import java.net.CookieStore
 import java.net.URLDecoder
 import java.util.UUID
 
 class MediaDetailService(
     private val ageApiService: AgeApiService,
+    private val cookieStore: CookieStore,
+    private val cookieJar: CookieJar,
     private val debug: Boolean = false
 ) : IMediaDetailService {
 
@@ -130,8 +135,8 @@ class MediaDetailService(
         )
     }
 
-    private suspend fun getPlayInfo(url: String): AgePlayInfoModel {
-        val doc = jsoupGet(url)
+    private fun getPlayInfo(url: String): AgePlayInfoModel {
+        val doc = jsoupGet(url = url, cookieStore = cookieStore)
         val head = doc.head()
         val body = doc.body()
         val key1 = head.selectFirst("meta[http-equiv=\"Content-Type\"]")
@@ -172,7 +177,8 @@ class MediaDetailService(
                 .encryptAES128CBCPKCS7(WASM_AES_KEY, WASM_AES_KEY)
                 .toHexString(HexFormat.UpperCase)
             Timber.i("api baseUrl: $baseUrl")
-            val resp = getVipApiService(baseUrl, debug).api(
+            val resp =
+                getVipApiService(baseUrl = baseUrl, debug = debug, cookieJar = cookieJar).api(
                 params = encryptReq,
                 uuid = uuid,
                 time = playInfo.time,
@@ -223,10 +229,9 @@ class MediaDetailService(
     companion object {
         private const val WASM_AES_KEY = "ni po jie ni ** "
 
-        private suspend fun jsoupGet(url: String): Document {
+        private fun jsoupGet(url: String, cookieStore: CookieStore): Document {
             return Jsoup.connect(url)
-                .header("User-Agent", ChromeUserAgent)
-                .header("Referer", AgeMobileUrl)
+                .feignChrome(referrer = AgeMobileUrl, cookieStore = cookieStore)
                 .timeout(10 * 1000)
                 .get()
         }
@@ -244,7 +249,7 @@ class MediaDetailService(
         private var DEFAULT_VIP_API_SERVICE: AgeVipPlayerApiService? = null
 
         @Synchronized
-        private fun createDefaultRetrofit(baseUrl: String, debug: Boolean) {
+        private fun createDefaultRetrofit(baseUrl: String, debug: Boolean, cookieJar: CookieJar) {
             if (DEFAULT_RETROFIT == null) {
                 DEFAULT_RETROFIT = Retrofit.Builder()
                     .baseUrl(baseUrl)
@@ -261,6 +266,7 @@ class MediaDetailService(
                             loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
                             it.addInterceptor(loggingInterceptor)
                         }
+                        it.cookieJar(cookieJar)
                     }.build())
                     .build()
                 DEFAULT_VIP_API_SERVICE =
@@ -268,9 +274,13 @@ class MediaDetailService(
             }
         }
 
-        private fun getVipApiService(baseUrl: String, debug: Boolean): AgeVipPlayerApiService {
+        private fun getVipApiService(
+            baseUrl: String,
+            debug: Boolean,
+            cookieJar: CookieJar
+        ): AgeVipPlayerApiService {
             if (DEFAULT_RETROFIT == null) {
-                createDefaultRetrofit(baseUrl, debug)
+                createDefaultRetrofit(baseUrl, debug, cookieJar)
             }
             return if (DEFAULT_RETROFIT!!.baseUrl().toString() == baseUrl) {
                 DEFAULT_VIP_API_SERVICE!!
