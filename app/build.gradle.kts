@@ -64,7 +64,8 @@ android {
 }
 dependencies {
     //implementation(libs.androidx.core.ktx)
-    implementation(project(":api"))
+    compileOnly(project(":api"))
+    testImplementation(project(":api"))
 
     testImplementation(libs.junit4)
     testImplementation(libs.kotlinx.coroutines.test)
