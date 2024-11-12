@@ -11,9 +11,9 @@ import com.muedsa.tvbox.api.service.IMainScreenService
 import com.muedsa.tvbox.api.service.IMediaDetailService
 import com.muedsa.tvbox.api.service.IMediaSearchService
 import com.muedsa.tvbox.tool.PluginCookieJar
-import com.muedsa.tvbox.tool.PluginCookieStore
 import com.muedsa.tvbox.tool.SharedCookieSaver
 import com.muedsa.tvbox.tool.createJsonRetrofit
+import com.muedsa.tvbox.tool.createOkHttpClient
 
 class AgeTvPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxContext) {
 
@@ -25,20 +25,24 @@ class AgeTvPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxCont
 
     private val cookieSaver by lazy { SharedCookieSaver(store = tvBoxContext.store) }
     private val cookieJar by lazy { PluginCookieJar(saver = cookieSaver) }
-    private val cookieStore by lazy { PluginCookieStore(saver = cookieSaver) }
+    private val okHttpClient by lazy {
+        createOkHttpClient(
+            debug = tvBoxContext.debug,
+            cookieJar = cookieJar
+        )
+    }
     private val ageApiService by lazy {
         createJsonRetrofit(
             baseUrl = AgeMobileApiUrl,
             service = AgeApiService::class.java,
-            debug = tvBoxContext.debug,
-            cookieJar = cookieJar
+            okHttpClient = okHttpClient
         )
     }
     private val mainScreenService by lazy { MainScreenService(ageApiService) }
     private val mediaDetailService by lazy {
         MediaDetailService(
             ageApiService = ageApiService,
-            cookieStore = cookieStore,
+            okHttpClient = okHttpClient,
             cookieJar = cookieJar,
             debug = tvBoxContext.debug
         )

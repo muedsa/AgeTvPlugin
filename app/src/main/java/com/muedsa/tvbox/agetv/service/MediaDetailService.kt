@@ -19,24 +19,25 @@ import com.muedsa.tvbox.tool.LenientJson
 import com.muedsa.tvbox.tool.decryptAES128CBCPKCS7
 import com.muedsa.tvbox.tool.encryptAES128CBCPKCS7
 import com.muedsa.tvbox.tool.feignChrome
+import com.muedsa.tvbox.tool.get
 import com.muedsa.tvbox.tool.md5
+import com.muedsa.tvbox.tool.parseHtml
+import com.muedsa.tvbox.tool.toRequestBuild
 import kotlinx.serialization.encodeToString
 import okhttp3.CookieJar
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import timber.log.Timber
-import java.net.CookieStore
 import java.net.URLDecoder
 import java.util.UUID
 
 class MediaDetailService(
     private val ageApiService: AgeApiService,
-    private val cookieStore: CookieStore,
+    private val okHttpClient: OkHttpClient,
     private val cookieJar: CookieJar,
     private val debug: Boolean = false
 ) : IMediaDetailService {
@@ -136,7 +137,7 @@ class MediaDetailService(
     }
 
     private fun getPlayInfo(url: String): AgePlayInfoModel {
-        val doc = jsoupGet(url = url, cookieStore = cookieStore)
+        val doc = jsoupGet(url = url)
         val head = doc.head()
         val body = doc.body()
         val key1 = head.selectFirst("meta[http-equiv=\"Content-Type\"]")
@@ -226,15 +227,14 @@ class MediaDetailService(
         }
     }
 
+    private fun jsoupGet(url: String): Document =
+        url.toRequestBuild()
+            .feignChrome(referer = AgeMobileUrl)
+            .get(okHttpClient = okHttpClient)
+            .parseHtml()
+
     companion object {
         private const val WASM_AES_KEY = "ni po jie ni ** "
-
-        private fun jsoupGet(url: String, cookieStore: CookieStore): Document {
-            return Jsoup.connect(url)
-                .feignChrome(referrer = AgeMobileUrl, cookieStore = cookieStore)
-                .timeout(10 * 1000)
-                .get()
-        }
 
         private fun getJsStringVar(field: String, content: String): String {
             val pattern = "var\\s+$field\\s*=\\s*['\"](.*?)['\"]\\s*;*".toRegex()
