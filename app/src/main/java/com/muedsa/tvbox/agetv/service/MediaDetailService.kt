@@ -16,6 +16,7 @@ import com.muedsa.tvbox.api.data.SavedMediaCard
 import com.muedsa.tvbox.api.service.IMediaDetailService
 import com.muedsa.tvbox.tool.ChromeUserAgent
 import com.muedsa.tvbox.tool.LenientJson
+import com.muedsa.tvbox.tool.checkSuccess
 import com.muedsa.tvbox.tool.decryptAES128CBCPKCS7
 import com.muedsa.tvbox.tool.encryptAES128CBCPKCS7
 import com.muedsa.tvbox.tool.feignChrome
@@ -231,6 +232,7 @@ class MediaDetailService(
         url.toRequestBuild()
             .feignChrome(referer = AgeMobileUrl)
             .get(okHttpClient = okHttpClient)
+            .checkSuccess()
             .parseHtml()
 
     companion object {
