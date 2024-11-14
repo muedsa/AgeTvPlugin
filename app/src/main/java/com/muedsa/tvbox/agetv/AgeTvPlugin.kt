@@ -10,6 +10,7 @@ import com.muedsa.tvbox.api.plugin.TvBoxContext
 import com.muedsa.tvbox.api.service.IMainScreenService
 import com.muedsa.tvbox.api.service.IMediaDetailService
 import com.muedsa.tvbox.api.service.IMediaSearchService
+import com.muedsa.tvbox.tool.IPv6Checker
 import com.muedsa.tvbox.tool.PluginCookieJar
 import com.muedsa.tvbox.tool.SharedCookieSaver
 import com.muedsa.tvbox.tool.createJsonRetrofit
@@ -23,12 +24,12 @@ class AgeTvPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxCont
 
     override suspend fun onLaunched() {}
 
-    private val cookieSaver by lazy { SharedCookieSaver(store = tvBoxContext.store) }
-    private val cookieJar by lazy { PluginCookieJar(saver = cookieSaver) }
+    private val cookieJar by lazy { PluginCookieJar(saver = SharedCookieSaver(store = tvBoxContext.store)) }
     private val okHttpClient by lazy {
         createOkHttpClient(
             debug = tvBoxContext.debug,
-            cookieJar = cookieJar
+            cookieJar = cookieJar,
+            onlyIpv4 = tvBoxContext.iPv6Status != IPv6Checker.IPv6Status.SUPPORTED
         )
     }
     private val ageApiService by lazy {
