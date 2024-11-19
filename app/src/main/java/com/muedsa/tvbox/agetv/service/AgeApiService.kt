@@ -11,6 +11,7 @@ import com.muedsa.tvbox.agetv.model.YearRankModel
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface AgeApiService {
 
@@ -25,15 +26,17 @@ interface AgeApiService {
 
     @GET("v2/catalog")
     suspend fun catalog(
-        @Query("genre") genre: String = "all",
-        @Query("label") label: String = "all",
-        @Query("letter") letter: String = "all",
-        @Query("order") order: String = "time",
-        @Query("region") region: String = "all",
-        @Query("resource") resource: String = "all",
-        @Query("season") season: String = "all",
-        @Query("status") status: String = "all",
-        @Query("year") year: String = "all",
+        @QueryMap queryMap: Map<String, String> = mapOf(
+            "region" to "all",
+            "genre" to "all",
+            "letter" to "all",
+            "year" to "all",
+            "season" to "all",
+            "status" to "all",
+            "label" to "all",
+            "resource" to "all",
+            "order" to "time",
+        ),
         @Query("page") page: Int = 1,
         @Query("size") size: Int = 10,
     ): PagedVideosModel<CatalogAnimeModel>
