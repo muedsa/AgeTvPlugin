@@ -1,11 +1,12 @@
 package com.muedsa.tvbox.agetv.service
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.muedsa.tvbox.agetv.AgeMobileUrl
 import com.muedsa.tvbox.agetv.AgeMobileUrlBase64
 import com.muedsa.tvbox.agetv.CardHeight
 import com.muedsa.tvbox.agetv.CardWidth
 import com.muedsa.tvbox.agetv.model.AgePlayInfoModel
+import com.muedsa.tvbox.api.data.DanmakuData
+import com.muedsa.tvbox.api.data.DanmakuDataFlow
 import com.muedsa.tvbox.api.data.MediaCardRow
 import com.muedsa.tvbox.api.data.MediaCardType
 import com.muedsa.tvbox.api.data.MediaDetail
@@ -32,6 +33,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import timber.log.Timber
 import java.net.URLDecoder
 import java.util.UUID
@@ -227,6 +229,11 @@ class MediaDetailService(
             }
         }
     }
+
+    override suspend fun getEpisodeDanmakuDataList(episode: MediaEpisode): List<DanmakuData> =
+        emptyList()
+
+    override suspend fun getEpisodeDanmakuDataFlow(episode: MediaEpisode): DanmakuDataFlow? = null
 
     private fun jsoupGet(url: String): Document =
         url.toRequestBuild()
