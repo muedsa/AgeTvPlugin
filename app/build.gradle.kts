@@ -25,8 +25,8 @@ android {
         applicationId = "com.muedsa.tvbox.agetv"
         minSdk = 24
         targetSdk = 35
-        versionCode = 11
-        versionName = "0.1.0"
+        versionCode = 12
+        versionName = "0.1.1"
     }
 
     signingConfigs {
@@ -89,7 +89,7 @@ tasks.withType<DexMergingTask> {
     doLast {
         println("taskName: $name")
         if (name.startsWith("mergeExtDex")) {
-            outputDir.get().asFile.listFiles().forEach {
+            outputDir.get().asFile.listFiles()?.forEach {
                 removePackagesFromDex(
                     file = it,
                     excludedPackages = listOf("kotlin", "kotlinx", "org.intellij", "org.jetbrains"),
