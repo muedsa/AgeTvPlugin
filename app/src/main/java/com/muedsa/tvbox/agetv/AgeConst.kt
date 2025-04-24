@@ -4,10 +4,9 @@ import com.muedsa.tvbox.api.data.MediaCatalogOption
 import com.muedsa.tvbox.api.data.MediaCatalogOptionItem
 import com.muedsa.tvbox.tool.decodeBase64ToStr
 
-
-const val AgeMobileUrlBase64 = "aHR0cHM6Ly9tLmFnZWRtLm9yZy8="
+const val AgeMobileUrlBase64 = "aHR0cHM6Ly9tLmFnZWZhbnMubGEv"
 val AgeMobileUrl = AgeMobileUrlBase64.decodeBase64ToStr()
-const val AgeMobileApiUrlBase64 = "aHR0cHM6Ly9hcGkuYWdlZG0ub3JnLw0K"
+const val AgeMobileApiUrlBase64 = "aHR0cHM6Ly9hcGkuYWdlZmFucy5sYS8="
 val AgeMobileApiUrl = AgeMobileApiUrlBase64.decodeBase64ToStr()
 
 const val CardWidth = 128
@@ -16,7 +15,7 @@ const val HorizontalCardWidth = 240
 const val HorizontalCardHeight = 135
 
 
-val AgeCatalogOptions = listOf<MediaCatalogOption>(
+val AgeCatalogOptions = listOf(
     MediaCatalogOption(
         name = "地区",
         value = "region",
