@@ -1,6 +1,7 @@
 package com.muedsa.tvbox.agetv
 
 import com.muedsa.tvbox.agetv.service.AgeApiService
+import com.muedsa.tvbox.agetv.service.AgeUrlService
 import com.muedsa.tvbox.agetv.service.MainScreenService
 import com.muedsa.tvbox.agetv.service.MediaCatalogService
 import com.muedsa.tvbox.agetv.service.MediaDetailService
@@ -34,9 +35,14 @@ class AgeTvPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxCont
             onlyIpv4 = tvBoxContext.iPv6Status != IPv6Checker.IPv6Status.SUPPORTED
         )
     }
+
+    private val ageUrlService by lazy {
+        AgeUrlService(okHttpClient = okHttpClient)
+    }
+
     private val ageApiService by lazy {
         createJsonRetrofit(
-            baseUrl = AgeMobileApiUrl,
+            baseUrl = ageUrlService.mobileApiUrl,
             service = AgeApiService::class.java,
             okHttpClient = okHttpClient
         )
@@ -44,6 +50,7 @@ class AgeTvPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxCont
     private val mainScreenService by lazy { MainScreenService(ageApiService) }
     private val mediaDetailService by lazy {
         MediaDetailService(
+            ageUrlService = ageUrlService,
             ageApiService = ageApiService,
             okHttpClient = okHttpClient,
             cookieJar = cookieJar,
