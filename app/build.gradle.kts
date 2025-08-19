@@ -86,6 +86,9 @@ dependencies {
     testImplementation(libs.junit4)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.bcprov.jdk15to18)
+
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.robolectric)
 }
 
 tasks.withType<DexMergingTask> {

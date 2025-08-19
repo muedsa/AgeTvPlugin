@@ -2,7 +2,12 @@ package com.muedsa.tvbox.agetv.service
 
 import com.muedsa.tvbox.tool.createOkHttpClient
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class AgeUrlServiceTest {
     private val service = AgeUrlService(createOkHttpClient())
 

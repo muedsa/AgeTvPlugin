@@ -5,12 +5,16 @@ junit4 = "4.13.2"
 kotlinxCoroutinesTest = "1.9.0"
 bcprovJdk = "1.79"
 smaliDexlib2 = "3.0.9"
+androidxTest = "1.6.1"
+robolectric = "4.14.1"
 
 [libraries]
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 bcprov-jdk15to18 = { module = "org.bouncycastle:bcprov-jdk15to18", version.ref = "bcprovJdk" }
 smali-dexlib2 = { module = "com.android.tools.smali:smali-dexlib2", version.ref = "smaliDexlib2" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTest" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
