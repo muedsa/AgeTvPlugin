@@ -25,8 +25,8 @@ android {
         applicationId = "com.muedsa.tvbox.agetv"
         minSdk = 24
         targetSdk = 36
-        versionCode = 15
-        versionName = "0.2.2"
+        versionCode = 16
+        versionName = "0.2.3"
     }
 
     signingConfigs {
