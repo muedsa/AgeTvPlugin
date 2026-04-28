@@ -25,8 +25,8 @@ android {
         applicationId = "com.muedsa.tvbox.agetv"
         minSdk = 24
         targetSdk = 36
-        versionCode = 16
-        versionName = "0.2.3"
+        versionCode = 17
+        versionName = "0.2.4"
     }
 
     signingConfigs {
@@ -80,8 +80,8 @@ kotlin {
 
 dependencies {
     //implementation(libs.androidx.core.ktx)
-    compileOnly(project(":api"))
-    testImplementation(project(":api"))
+    compileOnly(libs.tvbox.api)
+    testImplementation(libs.tvbox.api)
 
     testImplementation(libs.junit4)
     testImplementation(libs.kotlinx.coroutines.test)
