@@ -7,7 +7,7 @@ kotlinxCoroutinesTest = "1.9.0"
 bcprovJdk = "1.79"
 smaliDexlib2 = "3.0.9"
 androidxTest = "1.6.1"
-robolectric = "4.14.1"
+robolectric = "4.16.1"
 
 [libraries]
 tvbox-api = { module = "com.muedsa.tvbox:api", version.ref = "tvboxApi" }
