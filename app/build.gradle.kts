@@ -18,14 +18,14 @@ if (keystorePropertiesFile.exists() && keystorePropertiesFile.canRead()) {
 
 android {
     namespace = "com.muedsa.tvbox.agetv"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.muedsa.tvbox.agetv"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 17
-        versionName = "0.2.4"
+        targetSdk = 37
+        versionCode = 18
+        versionName = "0.3.0"
     }
 
     signingConfigs {
