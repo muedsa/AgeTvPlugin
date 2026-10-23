@@ -4,6 +4,7 @@ import com.muedsa.tvbox.agetv.CardHeight
 import com.muedsa.tvbox.agetv.CardWidth
 import com.muedsa.tvbox.agetv.HorizontalCardHeight
 import com.muedsa.tvbox.agetv.HorizontalCardWidth
+import com.muedsa.tvbox.agetv.model.BgmRatingBatchQueryResult
 import com.muedsa.tvbox.agetv.model.PosterAnimeModel
 import com.muedsa.tvbox.agetv.model.RankAnimeModel
 import com.muedsa.tvbox.agetv.model.WeekAnimeModel
@@ -14,7 +15,8 @@ import com.muedsa.tvbox.api.service.IMainScreenService
 import java.util.Calendar
 
 class MainScreenService(
-    private val ageApiService: AgeApiService
+    private val ageApiService: AgeApiService,
+    private val bgmRatingQueryService: BgmRatingQueryService,
 ) : IMainScreenService {
 
     override suspend fun getRowsData(): List<MediaCardRow> {
@@ -29,10 +31,26 @@ class MainScreenService(
 
     private suspend fun appendHomeList(rows: MutableList<MediaCardRow>) {
         val homeList = ageApiService.homeList()
+        val results = BgmRatingQueryService.loopPosterBatchQuery(
+            medias = buildList {
+                addAll(homeList.latest)
+                addAll(homeList.recommend)
+                addAll(homeList.weekList.values.flatten().map {
+                    PosterAnimeModel(
+                        aid = it.id,
+                        href = "",
+                        newTitle = "",
+                        picSmall = "",
+                        title = it.name
+                    )
+                })
+            },
+            service = bgmRatingQueryService,
+        )
         rows.add(
             MediaCardRow(
                 title = "最近更新",
-                list = convertPosterAnimeToCardList(homeList.latest),
+                list = convertPosterAnimeToCardList(homeList.latest, results),
                 cardWidth = CardWidth,
                 cardHeight = CardHeight,
                 cardType = MediaCardType.STANDARD
@@ -41,7 +59,7 @@ class MainScreenService(
         rows.add(
             MediaCardRow(
                 title = "每日推荐",
-                list = convertPosterAnimeToCardList(homeList.recommend),
+                list = convertPosterAnimeToCardList(homeList.recommend, results),
                 cardWidth = CardWidth,
                 cardHeight = CardHeight,
                 cardType = MediaCardType.STANDARD
@@ -51,7 +69,7 @@ class MainScreenService(
             rows.add(
                 MediaCardRow(
                     title = "每周放送 · ${WEEK_NAMES[index]}",
-                    list = convertWeekListToColorCardList(index, entry.value),
+                    list = convertWeekListToColorCardList(index, entry.value, results),
                     cardWidth = HorizontalCardWidth,
                     cardHeight = HorizontalCardHeight,
                     cardType = MediaCardType.NOT_IMAGE
@@ -82,10 +100,14 @@ class MainScreenService(
 
     private suspend fun appendRecommend(rows: MutableList<MediaCardRow>) {
         val paged = ageApiService.recommend()
+        val results = BgmRatingQueryService.loopPosterBatchQuery(
+            medias = paged.videos,
+            service = bgmRatingQueryService,
+        )
         rows.add(
             MediaCardRow(
                 title = "推荐列表",
-                list = convertPosterAnimeToCardList(paged.videos),
+                list = convertPosterAnimeToCardList(paged.videos, results),
                 cardWidth = CardWidth,
                 cardHeight = CardHeight,
                 cardType = MediaCardType.STANDARD
@@ -95,10 +117,14 @@ class MainScreenService(
 
     private suspend fun appendUpdate(rows: MutableList<MediaCardRow>) {
         val paged = ageApiService.update()
+        val results = BgmRatingQueryService.loopPosterBatchQuery(
+            medias = paged.videos,
+            service = bgmRatingQueryService,
+        )
         rows.add(
             MediaCardRow(
                 title = "更新列表",
-                list = convertPosterAnimeToCardList(paged.videos),
+                list = convertPosterAnimeToCardList(paged.videos, results),
                 cardWidth = CardWidth,
                 cardHeight = CardHeight,
                 cardType = MediaCardType.STANDARD
@@ -122,13 +148,22 @@ class MainScreenService(
     }
 
     companion object {
-        fun convertPosterAnimeToCardList(list: List<PosterAnimeModel>): List<MediaCard> =
+        fun convertPosterAnimeToCardList(
+            list: List<PosterAnimeModel>,
+            results: Map<String, BgmRatingBatchQueryResult>,
+        ): List<MediaCard> =
             list.map {
+                val id = it.aid.toString()
+                val result = results[id]
+                var subTitle = it.newTitle
+                if (result?.rating?.score != null) {
+                    subTitle = "$subTitle ★${result.rating.score}"
+                }
                 MediaCard(
-                    id = it.aid.toString(),
+                    id = id,
                     title = it.title,
-                    detailUrl = it.aid.toString(),
-                    subTitle = it.newTitle,
+                    detailUrl = id,
+                    subTitle = subTitle,
                     coverImageUrl = it.picSmall
             )
         }
@@ -144,14 +179,21 @@ class MainScreenService(
 
         private fun convertWeekListToColorCardList(
             weekIndex: Int,
-            list: List<WeekAnimeModel>
+            list: List<WeekAnimeModel>,
+            results: Map<String, BgmRatingBatchQueryResult>,
         ): List<MediaCard> =
             list.mapIndexed { index, item ->
+                val id = item.id.toString()
+                val result = results[id]
+                var subTitle = item.nameForNew
+                if (result?.rating?.score != null) {
+                    subTitle = "$subTitle ★${result.rating.score}"
+                }
                 MediaCard(
                     id = item.id.toString(),
                     title = item.name,
                     detailUrl = item.id.toString(),
-                    subTitle = item.nameForNew,
+                    subTitle = subTitle,
                     backgroundColor = WEEK_CARD_COLORS[(index + weekIndex) % WEEK_CARD_COLORS.size]
                 )
             }

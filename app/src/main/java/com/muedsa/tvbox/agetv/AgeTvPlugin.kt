@@ -2,6 +2,7 @@ package com.muedsa.tvbox.agetv
 
 import com.muedsa.tvbox.agetv.service.AgeApiService
 import com.muedsa.tvbox.agetv.service.AgeUrlService
+import com.muedsa.tvbox.agetv.service.BgmRatingQueryService
 import com.muedsa.tvbox.agetv.service.MainScreenService
 import com.muedsa.tvbox.agetv.service.MediaCatalogService
 import com.muedsa.tvbox.agetv.service.MediaDetailService
@@ -47,18 +48,41 @@ class AgeTvPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxCont
             okHttpClient = okHttpClient
         )
     }
-    private val mainScreenService by lazy { MainScreenService(ageApiService) }
+    private val bgmRatingQueryService by lazy {
+        createJsonRetrofit(
+            baseUrl = "https://bgm.muedsa.com/",
+            service = BgmRatingQueryService::class.java,
+            okHttpClient = okHttpClient,
+        )
+    }
+    private val mainScreenService by lazy {
+        MainScreenService(
+            ageApiService = ageApiService,
+            bgmRatingQueryService = bgmRatingQueryService,
+        )
+    }
     private val mediaDetailService by lazy {
         MediaDetailService(
             ageUrlService = ageUrlService,
             ageApiService = ageApiService,
+            bgmRatingQueryService = bgmRatingQueryService,
             okHttpClient = okHttpClient,
             cookieJar = cookieJar,
             debug = tvBoxContext.debug
         )
     }
-    private val mediaSearchService by lazy { MediaSearchService(ageApiService) }
-    private val mediaCatalogService by lazy { MediaCatalogService(ageApiService) }
+    private val mediaSearchService by lazy {
+        MediaSearchService(
+            ageApiService = ageApiService,
+            bgmRatingQueryService = bgmRatingQueryService,
+        )
+    }
+    private val mediaCatalogService by lazy {
+        MediaCatalogService(
+            ageApiService = ageApiService,
+            bgmRatingQueryService = bgmRatingQueryService,
+        )
+    }
 
     override fun provideMainScreenService(): IMainScreenService = mainScreenService
 

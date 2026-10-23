@@ -12,6 +12,7 @@ import com.muedsa.tvbox.api.service.IMediaCatalogService
 
 class MediaCatalogService(
     private val ageApiService: AgeApiService,
+    private val bgmRatingQueryService: BgmRatingQueryService,
 ) : IMediaCatalogService {
 
     override suspend fun getConfig(): MediaCatalogConfig =
@@ -37,15 +38,24 @@ class MediaCatalogService(
             page = page,
             size = loadSize
         )
+        val results = BgmRatingQueryService.loopCatalogBatchQuery(
+            medias = resp.videos,
+            service = bgmRatingQueryService,
+        )
         return PagingResult(
             list = resp.videos.map {
-                val mediaId = it.id.toString()
+                val id = it.id.toString()
+                val result = results[id]
+                var subTitle = it.status
+                if (result?.rating?.score != null) {
+                    subTitle = "$subTitle ★${result.rating.score}"
+                }
                 MediaCard(
-                    id = mediaId,
+                    id = id,
                     title = it.name,
-                    subTitle = it.status,
+                    subTitle = subTitle,
                     coverImageUrl = it.cover,
-                    detailUrl = mediaId
+                    detailUrl = id
                 )
             },
             prevKey = if (page > 1) "${page - 1}" else null,

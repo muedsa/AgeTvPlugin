@@ -38,6 +38,7 @@ import java.util.UUID
 class MediaDetailService(
     private val ageUrlService: AgeUrlService,
     private val ageApiService: AgeApiService,
+    private val bgmRatingQueryService: BgmRatingQueryService,
     private val okHttpClient: OkHttpClient,
     private val cookieJar: CookieJar,
     private val debug: Boolean = false
@@ -47,6 +48,13 @@ class MediaDetailService(
         val longId = mediaId.toLong()
         val detail = ageApiService.detail(longId)
         val strId = detail.video.id.toString()
+        val results = BgmRatingQueryService.loopPosterBatchQuery(
+            medias = buildList {
+                addAll(detail.series)
+                addAll(detail.similar)
+            },
+            service = bgmRatingQueryService,
+        )
         return MediaDetail(
             id = strId,
             title = detail.video.name,
@@ -90,7 +98,7 @@ class MediaDetailService(
                     add(
                         MediaCardRow(
                             title = "相关动画",
-                            list = MainScreenService.convertPosterAnimeToCardList(detail.series),
+                            list = MainScreenService.convertPosterAnimeToCardList(detail.series, results),
                             cardWidth = CardWidth,
                             cardHeight = CardHeight,
                             cardType = MediaCardType.STANDARD
@@ -101,7 +109,7 @@ class MediaDetailService(
                     add(
                         MediaCardRow(
                             title = "相关推荐",
-                            list = MainScreenService.convertPosterAnimeToCardList(detail.similar),
+                            list = MainScreenService.convertPosterAnimeToCardList(detail.similar, results),
                             cardWidth = CardWidth,
                             cardHeight = CardHeight,
                             cardType = MediaCardType.STANDARD
