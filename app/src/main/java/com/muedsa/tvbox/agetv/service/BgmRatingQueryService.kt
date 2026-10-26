@@ -7,11 +7,13 @@ import com.muedsa.tvbox.agetv.model.BgmRatingBatchQueryResult
 import com.muedsa.tvbox.agetv.model.CatalogAnimeModel
 import com.muedsa.tvbox.agetv.model.PosterAnimeModel
 import retrofit2.http.Body
+import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface BgmRatingQueryService {
 
     @POST("api/v1/ratings/batch")
+    @Headers("User-Agent: muedsa/AgeTvPlugin (https://github.com/muedsa/AgeTvPlugin)")
     suspend fun batchQuery(@Body req: BgmRatingBatchQueryReq): BgmRatingBatchQueryResp
 
     companion object {
